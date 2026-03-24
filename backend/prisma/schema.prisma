@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+// 👤 User Model
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  password      String?
+  firebase_uid  String?    @unique
+  createdAt     DateTime   @default(now())
+
+  documents     Document[]
+}
+
+// 📄 Document Model
+model Document {
+  id         String   @id @default(uuid())
+  fileName   String
+  fileUrl    String
+  fileType   String
+  category   String?
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  createdAt  DateTime @default(now())
+}
