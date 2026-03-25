@@ -1,14 +1,21 @@
 import jwt from "jsonwebtoken";
+import { tokenBlacklist } from "../utils/token.js";
 
-export const verifyJWT = (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
+  if (tokenBlacklist.has(token)) {
+    return res.status(401).json({ message: "Unauthorized: Token invalidated" });
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("decoded",decoded);
+    
     req.user = decoded;
     next();
   } catch (error) {

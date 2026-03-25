@@ -17,7 +17,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // routes
+
+// user routes
 import authRoutes from "./routes/auth.routes.js";
 app.use("/api/auth", authRoutes);
+
+// document routes
+import documentRoutes from "./routes/document.routes.js";
+app.use("/api/documents", documentRoutes);
 
 export default app;

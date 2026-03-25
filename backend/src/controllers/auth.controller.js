@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import prisma from "../config/db.js";
-import { generateToken } from "../utils/token.js";
+import { generateToken, tokenBlacklist } from "../utils/token.js";
 import admin from "../config/firebase.js";
 import validator from "validator";
 
@@ -21,7 +21,7 @@ export const registerUser = async (req, res) => {
    }
 
     // check user exist
-    const existingUser = await prisma.User.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: {
         email: email,
       },
@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
     });
 
     // save user
-    const user = await prisma.User.create({
+    const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -55,13 +55,13 @@ export const registerUser = async (req, res) => {
     // send cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // production → true
+      secure: false, // After production change to true
       sameSite: "lax",
     });
 
-    res.json({ message: "User registered", user });
+    res.status(201).json({ message: "User registered", user });
   } catch (error) {
-    console.log("FULL ERROR 👉", error); // 👈 ये जरूरी है
+    console.log("FULL ERROR 👉", error); 
     res.status(500).json({ error });
   }
 };
@@ -92,7 +92,7 @@ export const loginUser = async (req, res) => {
     // send cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // production → true
+      secure: false, // After production change to true
       sameSite: "lax",
     });
 
@@ -105,7 +105,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// ✅ GOOGLE LOGIN (Firebase)
+//  GOOGLE LOGIN (Firebase)
 export const googleLogin = async (req, res) => {
   try {
     const { token } = req.body;
@@ -115,12 +115,12 @@ export const googleLogin = async (req, res) => {
 
     const { uid, email } = decoded;
 
-    // check user exist
+    // check if user exist
     let user = await prisma.user.findUnique({
       where: { firebase_uid: uid },
     });
 
-    // अगर user नहीं है → create करो
+    
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -145,5 +145,23 @@ export const googleLogin = async (req, res) => {
     });
   } catch (error) {
     res.status(401).json({ message: "Invalid Firebase token" });
+  }
+};
+
+
+// logout
+export const logoutUser = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if(!token){
+      return res.status(400).json({ message: "Token is required" });
+    }
+    
+    tokenBlacklist.add(token);
+    
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logout success" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

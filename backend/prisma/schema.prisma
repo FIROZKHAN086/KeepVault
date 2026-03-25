@@ -7,7 +7,7 @@ datasource db {
   
 }
 
-// 👤 User Model
+//  User Model
 model User {
   id            String     @id @default(uuid())
   email         String     @unique
@@ -18,7 +18,7 @@ model User {
   documents     Document[]
 }
 
-// 📄 Document Model
+//  Document Model
 model Document {
   id         String   @id @default(uuid())
   fileName   String
