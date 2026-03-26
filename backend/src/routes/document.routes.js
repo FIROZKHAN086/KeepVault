@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadDocument, getDocuments, editDocument, deleteDocument, getDocumentById } from "../controllers/document.controller.js";
+import { uploadDocument, getDocuments, editDocument, deleteDocument, getDocumentById, getDocumentByUserId } from "../controllers/document.controller.js";
 import multer from "multer";
 import  {authMiddleware}  from "../middleware/auth.middleware.js";
 
@@ -27,5 +27,8 @@ router.delete("/delete/:id",authMiddleware, deleteDocument);
 
 // get document by id
 router.get("/get/:id",authMiddleware, getDocumentById);
+
+// get document by user_id
+router.get("/get/user/:userId",authMiddleware, getDocumentByUserId);
 
 export default router;

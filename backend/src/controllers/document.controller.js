@@ -21,12 +21,12 @@ const uploadFile = (file, userId) => {
         }
       }
     );
-    //console.log(stream);
+    
     
 
-    // buffer → stream → cloudinary and Url
+    
     streamifier.createReadStream(file.buffer).pipe(stream);
-    //console.log(streamifier.createReadStream(file.buffer).pipe(stream));
+    
     
   });
 };
@@ -59,16 +59,13 @@ export const uploadDocument = async (req, res) => {
     const uploadResult = await uploadFile(file, userId);
 
 
-    console.log("uploadResult" + uploadResult);
     
 
     // file encript
       const encriptedFile = await encrypt(uploadResult.secure_url);
 
-      console.log("encriptedFile" + encriptedFile);
       
 
-   // console.log(uploadResult);
     
 
     //  Save in DB
@@ -88,7 +85,7 @@ export const uploadDocument = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("ERROR ", error);
+    // console.log("ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -105,7 +102,7 @@ export const getDocuments = async (req, res) => {
 
     res.status(200).json(documents);
   } catch (error) {
-    console.log(" ERROR ", error);
+    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -138,7 +135,6 @@ export const getDocumentById = async (req, res) => {
     // file decript
     const decriptedFile = await decrypt(document.fileUrl);
 
-    // console.log("decriptedFile" + decriptedFile);
     
 
     res.status(200).json({
@@ -149,7 +145,47 @@ export const getDocumentById = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(" ERROR ", error);
+    // console.log(" ERROR ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// get document by user_id controller
+export const getDocumentByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if(userId !== req.user.id){
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if(!userId){
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const documents = await prisma.document.findMany({
+      where: { userId },
+    });
+
+    if (!documents.userId===userId){
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!documents) {
+      return res.status(404).json({ message: "Documents not found" });
+    }
+
+  const updatedDocs = documents.map((doc) => ({
+      ...doc,
+      fileUrl: doc.fileUrl ? decrypt(doc.fileUrl) : null,
+    }));
+
+    res.status(200).json({
+      message: "Documents fetched successfully",
+      documents: updatedDocs,
+    });
+  } catch (error) {
+    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -158,7 +194,6 @@ export const getDocumentById = async (req, res) => {
 export const editDocument = async (req, res) => {
   try {
     const { id } = req.params;
-    // const {firebase_uid} = req.params;
     const { fileName, fileType, category } = req.body;
     const file = req.file;
     
@@ -185,13 +220,11 @@ export const editDocument = async (req, res) => {
     const uploadResult = await uploadFile(file, userId);
 
 
-      // console.log("uploadResult" + uploadResult);
     
 
     // file encript
       const encriptedFile = await encrypt(uploadResult.secure_url);
 
-      // console.log("encriptedFile" + encriptedFile);
 
     const updatedDocument = await prisma.document.update({
       where: { id },
@@ -208,7 +241,7 @@ export const editDocument = async (req, res) => {
       document: updatedDocument,
     });
   } catch (error) {
-    console.log(" ERROR ", error);
+    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -245,7 +278,7 @@ export const deleteDocument = async (req, res) => {
 
     res.status(200).json({ message: "Document deleted successfully" });
   } catch (error) {
-    console.log(" ERROR ", error);
+    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };

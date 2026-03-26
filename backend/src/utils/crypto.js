@@ -2,38 +2,58 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
-
 const algorithm = "aes-256-cbc";
-const secretKey = process.env.CRYPTO_SECRET; 
 
+// ✅ hex → buffer (correct)
+const secretKey = Buffer.from(process.env.CRYPTO_SECRET, "hex");
+
+// ✅ Encrypt
 export const encrypt = (text) => {
-  const iv = crypto.randomBytes(16);
+  try {
+    const iv = crypto.randomBytes(16);
 
-  const cipher = crypto.createCipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
+    const cipher = crypto.createCipheriv(
+      algorithm,
+      secretKey, 
+      iv
+    );
 
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
+    let encrypted = cipher.update(text, "utf8", "hex"); 
+    encrypted += cipher.final("hex");
 
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
+    return iv.toString("hex") + ":" + encrypted;
+
+  } catch (error) {
+    console.log("ENCRYPT ERROR ", error.message);
+    return null;
+  }
 };
 
+// ✅ Decrypt (safe version)
 export const decrypt = (encryptedText) => {
-  const parts = encryptedText.split(":");
-  const iv = Buffer.from(parts[0], "hex");
-  const encryptedData = Buffer.from(parts[1], "hex");
+  try {
+    if (!encryptedText) return null;
 
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
+    const parts = encryptedText.split(":");
 
-  let decrypted = decipher.update(encryptedData);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
+    if (parts.length !== 2) return encryptedText; // fallback
 
-  return decrypted.toString();
+    const iv = Buffer.from(parts[0], "hex");
+    const encryptedData = parts[1];
+
+    const decipher = crypto.createDecipheriv(
+      algorithm,
+      secretKey, 
+      iv
+    );
+
+    let decrypted = decipher.update(encryptedData, "hex", "utf8"); 
+    decrypted += decipher.final("utf8");
+
+    return decrypted;
+
+  } catch (error) {
+    console.log("DECRYPT ERROR ", error.message);
+    return encryptedText; 
+  }
 };
