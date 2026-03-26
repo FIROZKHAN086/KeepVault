@@ -1,6 +1,7 @@
 import prisma from "../config/db.js";
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
+import { encrypt, decrypt } from "../utils/crypto.js";
 
 
 //  upload function
@@ -13,7 +14,7 @@ const uploadFile = (file, userId) => {
       },
       (error, result) => {
         if (error) {
-          console.log("UPLOAD ERROR 👉", error);
+          console.log("UPLOAD ERROR ", error);
           reject(error);
         } else {
           resolve(result);
@@ -57,6 +58,16 @@ export const uploadDocument = async (req, res) => {
     //  Upload to Cloudinary
     const uploadResult = await uploadFile(file, userId);
 
+
+    console.log("uploadResult" + uploadResult);
+    
+
+    // file encript
+      const encriptedFile = await encrypt(uploadResult.secure_url);
+
+      console.log("encriptedFile" + encriptedFile);
+      
+
    // console.log(uploadResult);
     
 
@@ -64,7 +75,7 @@ export const uploadDocument = async (req, res) => {
     const document = await prisma.document.create({
       data: {
         fileName,
-        fileUrl: uploadResult.secure_url,
+        fileUrl: encriptedFile,
         fileType: uploadResult.resource_type,
         category,
         userId,
@@ -77,7 +88,7 @@ export const uploadDocument = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("FULL ERROR 👉", error);
+    console.log("ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -94,7 +105,51 @@ export const getDocuments = async (req, res) => {
 
     res.status(200).json(documents);
   } catch (error) {
-    console.log("FULL ERROR 👉", error);
+    console.log(" ERROR ", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// get  document by id controller
+export const getDocumentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    if(!id){
+      return res.status(400).json({ message: "Document ID is required" });
+    }
+    if(!userId){
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const document = await prisma.document.findUnique({
+      where: { id },
+    });
+
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    if (document.userId !== userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // file decript
+    const decriptedFile = await decrypt(document.fileUrl);
+
+    // console.log("decriptedFile" + decriptedFile);
+    
+
+    res.status(200).json({
+      message: "Document fetched successfully",
+      document: {
+        ...document,
+        fileUrl: decriptedFile,
+      },
+    });
+  } catch (error) {
+    console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -105,11 +160,13 @@ export const editDocument = async (req, res) => {
     const { id } = req.params;
     // const {firebase_uid} = req.params;
     const { fileName, fileType, category } = req.body;
+    const file = req.file;
     
     
-    if(!fileName || !fileType || !category){
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    
+   if (!fileName && !fileType && !category && !file) {
+  return res.status(400).json({ message: "No data provided" });
+}
 
     const userId = req.user.id;
 
@@ -125,12 +182,24 @@ export const editDocument = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    const uploadResult = await uploadFile(file, userId);
+
+
+      // console.log("uploadResult" + uploadResult);
+    
+
+    // file encript
+      const encriptedFile = await encrypt(uploadResult.secure_url);
+
+      // console.log("encriptedFile" + encriptedFile);
+
     const updatedDocument = await prisma.document.update({
       where: { id },
       data: {
         fileName,
         fileType,
         category,
+        fileUrl: encriptedFile,
       },
     });
 
@@ -139,7 +208,7 @@ export const editDocument = async (req, res) => {
       document: updatedDocument,
     });
   } catch (error) {
-    console.log("FULL ERROR 👉", error);
+    console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -176,7 +245,7 @@ export const deleteDocument = async (req, res) => {
 
     res.status(200).json({ message: "Document deleted successfully" });
   } catch (error) {
-    console.log("FULL ERROR 👉", error);
+    console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
