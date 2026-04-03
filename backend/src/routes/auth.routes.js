@@ -3,8 +3,10 @@ import {
   registerUser,
   loginUser,
   googleLogin,
-  logoutUser
+  logoutUser,
+  getMe
 } from "../controllers/auth.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 // register route
@@ -15,5 +17,7 @@ router.post("/login", loginUser);
 router.post("/google", googleLogin);
 // logout route
 router.post("/logout", logoutUser);
+// get current user route
+router.get("/me", authMiddleware, getMe);
 
 export default router;

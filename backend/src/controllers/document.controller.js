@@ -7,27 +7,37 @@ import { encrypt, decrypt } from "../utils/crypto.js";
 //  upload function
 const uploadFile = (file, userId) => {
   return new Promise((resolve, reject) => {
+
+    //  Detect file type
+    let fileType = "other";
+
+    if (file.mimetype.startsWith("image/")) {
+      fileType = "image";
+    } else if (file.mimetype.startsWith("video/")) {
+      fileType = "video";
+    } else if (file.mimetype === "application/pdf") {
+      fileType = "pdf";
+    }
+
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: `documents/${userId}`,
-        resource_type: "auto", 
+        resource_type: "auto",
       },
       (error, result) => {
         if (error) {
           console.log("UPLOAD ERROR ", error);
           reject(error);
         } else {
-          resolve(result);
+          resolve({
+            ...result,
+            fileType, 
+          });
         }
       }
     );
-    
-    
 
-    
     streamifier.createReadStream(file.buffer).pipe(stream);
-    
-    
   });
 };
 
@@ -73,7 +83,7 @@ export const uploadDocument = async (req, res) => {
       data: {
         fileName,
         fileUrl: encriptedFile,
-        fileType: uploadResult.resource_type,
+        fileType: uploadResult.resource_type === 'raw' ? 'PDF' : uploadResult.resource_type,
         category,
         userId,
       },
@@ -167,25 +177,13 @@ export const getDocumentByUserId = async (req, res) => {
       where: { userId },
     });
 
-    if (!documents.userId===userId){
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    if (!documents) {
-      return res.status(404).json({ message: "Documents not found" });
-    }
-
-  const updatedDocs = documents.map((doc) => ({
+    const updatedDocs = documents.map((doc) => ({
       ...doc,
       fileUrl: doc.fileUrl ? decrypt(doc.fileUrl) : null,
     }));
 
-    res.status(200).json({
-      message: "Documents fetched successfully",
-      documents: updatedDocs,
-    });
+    res.status(200).json(updatedDocs);
   } catch (error) {
-    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -217,21 +215,19 @@ export const editDocument = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const uploadResult = await uploadFile(file, userId);
+    let encriptedFile = document.fileUrl;
 
-
-    
-
-    // file encript
-      const encriptedFile = await encrypt(uploadResult.secure_url);
-
+    if (file) {
+      const uploadResult = await uploadFile(file, userId);
+      encriptedFile = await encrypt(uploadResult.secure_url);
+    }
 
     const updatedDocument = await prisma.document.update({
       where: { id },
       data: {
-        fileName,
-        fileType,
-        category,
+        fileName: fileName || document.fileName,
+        fileType: fileType || (file ? (encriptedFile.includes('.pdf') ? 'raw' : 'auto') : document.fileType), // Fallback logic
+        category: category || document.category,
         fileUrl: encriptedFile,
       },
     });
@@ -241,7 +237,6 @@ export const editDocument = async (req, res) => {
       document: updatedDocument,
     });
   } catch (error) {
-    // console.log(" ERROR ", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -275,6 +270,9 @@ export const deleteDocument = async (req, res) => {
     await prisma.document.delete({
       where: { id },
     });
+
+    // delete from cloudinary
+    await cloudinary.uploader.destroy(document.fileUrl);
 
     res.status(200).json({ message: "Document deleted successfully" });
   } catch (error) {

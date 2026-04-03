@@ -83,7 +83,7 @@ export const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Wrong password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     // generate JWT
@@ -161,6 +161,24 @@ export const logoutUser = async (req, res) => {
     
     res.clearCookie("token");
     res.status(200).json({ message: "Logout success" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// getMe - Get current user profile
+export const getMe = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, email: true }, 
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
