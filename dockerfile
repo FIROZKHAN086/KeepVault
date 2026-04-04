@@ -1,39 +1,44 @@
-# ─────────────────────────────────────────────────────────
-# Stage 1 — Build Next.js client (static export)
-# ─────────────────────────────────────────────────────────
+# ─────────────────────────────────────────
+# Stage 1 — Build Next.js (static export)
+# ─────────────────────────────────────────
 FROM node:20-alpine AS client-builder
 
 WORKDIR /app/client
 
-# Install dependencies first (layer caching)
+# Dependencies install
 COPY client/package*.json ./
-RUN npm ci
+RUN npm install
 
-# Copy source and build
+# Source code copy
 COPY client/ ./
+
+# Build + export static files
 RUN npm run build
 
-# ─────────────────────────────────────────────────────────
-# Stage 2 — Production image (Express backend)
-# ─────────────────────────────────────────────────────────
+
+
+# ─────────────────────────────────────────
+# Stage 2 — Backend + Static Serve
+# ─────────────────────────────────────────
 FROM node:20-alpine AS production
 
 WORKDIR /app/backend
 
-# Install backend dependencies
+# Backend dependencies
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
-# Copy backend source
+# Backend code
 COPY backend/ ./
 
-# Copy built Next.js static files into backend/public
-# Next.js static export goes to client/out by default
+# Frontend static files copy (VERY IMPORTANT)
 COPY --from=client-builder /app/client/out ./public
 
-# Generate Prisma client inside the image
+# Prisma client generate
 RUN npx prisma generate
 
+# Port expose
 EXPOSE 5000
 
+# Start server
 CMD ["node", "server.js"]
