@@ -36,7 +36,7 @@ export default function Navbar() {
       await logoutUser({}).unwrap();
       dispatch(logoutAction());
       setMobileOpen(false);
-      router.push('/Login');
+      router.push('/login');
     } catch (e) { console.error(e); }
   };
 
@@ -161,7 +161,7 @@ export default function Navbar() {
               ) : (
                 /* ── Guest auth buttons ── */
                 <div className="flex items-center gap-2">
-                  <Link href="/Login">
+                  <Link href="/login">
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
@@ -170,7 +170,7 @@ export default function Navbar() {
                       Sign In
                     </motion.button>
                   </Link>
-                  <Link href="/Register">
+                  <Link href="/register">
                     <motion.button
                       whileHover={{ scale: 1.03, y: -1 }}
                       whileTap={{ scale: 0.97 }}
@@ -307,12 +307,12 @@ export default function Navbar() {
                   </button>
                 ) : (
                   <>
-                    <Link href="/Login" className="block">
+                    <Link href="/login" className="block">
                       <button className="w-full py-3 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">
                         Sign In
                       </button>
                     </Link>
-                    <Link href="/Register" className="block">
+                    <Link href="/register" className="block">
                       <button className="relative w-full py-3 rounded-xl text-sm font-bold text-white overflow-hidden group shadow-lg shadow-violet-500/25">
                         <span className="absolute inset-0 bg-linear-to-r from-violet-600 to-fuchsia-600 group-hover:from-violet-500 group-hover:to-fuchsia-500 transition-all" />
                         <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-linear-to-r from-transparent via-white/20 to-transparent" />

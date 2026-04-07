@@ -41,14 +41,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    googleLogin: builder.mutation({
-      query: (token) => ({
-        url: "/auth/google",
-        method: "POST",
-        body: { token },
-      }),
-      invalidatesTags: ["User"],
-    }),
 
     // Document Endpoints
     getDocuments: builder.query({
@@ -92,7 +84,6 @@ export const {
   useLoginMutation, 
   useRegisterMutation, 
   useLogoutUserMutation, 
-  useGoogleLoginMutation,
   useGetDocumentsQuery,
   useGetDocumentsByUserIdQuery,
   useUploadDocumentMutation,

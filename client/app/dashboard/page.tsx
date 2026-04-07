@@ -45,7 +45,7 @@ export default function DashboardPage() {
   // Protect route
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
-      router.push('/Login');
+      router.push('/login');
     }
   }, [isAuthenticated, isInitializing, router]);
 

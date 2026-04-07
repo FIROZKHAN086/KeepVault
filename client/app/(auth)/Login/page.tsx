@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLoginMutation, useGoogleLoginMutation } from '@/store/api/apiSlice';
+import { useLoginMutation } from '@/store/api/apiSlice';
 import { useDispatch } from 'react-redux';
 import { setUser } from '@/store/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Lock, Mail, Eye, EyeOff, ArrowRight, Shield, Zap, Star, AlertCircle, Loader2 } from 'lucide-react';
-import { signInWithPopup } from 'firebase/auth';
-import { auth, provider } from '@/lib/firebase';
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,7 +17,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const [login, { isLoading }] = useLoginMutation();
-  const [googleLogin, { isLoading: googleLoading }] = useGoogleLoginMutation();
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -34,18 +32,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogle = async () => {
-    setError('');
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-      const res = await googleLogin(idToken).unwrap();
-      dispatch(setUser(res.user));
-      router.push('/dashboard');
-    } catch (err: any) {
-      setError('Google sign-in failed. Please try again.');
-    }
-  };
+ 
 
   return (
     <div className="min-h-screen flex bg-[#faf9f6] dark:bg-[#0a0612]">
@@ -141,17 +128,16 @@ export default function LoginPage() {
             <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Welcome back</h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
               New here?{' '}
-              <Link href="/Register" className="text-violet-600 dark:text-violet-400 font-semibold hover:underline underline-offset-2 transition-all">
+              <Link href="/register" className="text-violet-600 dark:text-violet-400 font-semibold hover:underline underline-offset-2 transition-all">
                 Create a free account
               </Link>
             </p>
           </div>
 
-          {/* Google Button */}
+          {/* Google Button
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            onClick={handleGoogle}
             disabled={googleLoading}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border-2 border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 hover:border-gray-300 dark:hover:border-white/20 font-semibold text-gray-700 dark:text-gray-200 text-sm transition-all duration-200 shadow-sm mb-5"
           >
@@ -166,7 +152,7 @@ export default function LoginPage() {
               </svg>
             )}
             Continue with Google
-          </motion.button>
+          </motion.button> */}
 
           {/* Divider */}
           <div className="flex items-center gap-4 mb-5">

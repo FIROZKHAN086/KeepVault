@@ -43,7 +43,7 @@ export default function MyDocumentsPage() {
   // Protect route
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
-      router.push('/Login');
+      router.push('/login');
     }
   }, [isAuthenticated, isInitializing, router]);
 

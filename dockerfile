@@ -14,7 +14,13 @@ COPY client/ ./
 
 # Build + export static files
 RUN npm run build
-
+ENV NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyADvwD2PvA8JIddLAckJ5-jm7gTx7pVktc"
+ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="keepvault-80270.firebaseapp.com"
+ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID="keepvault-80270"
+ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="keepvault.com"
+ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="862792318307"
+ENV NEXT_PUBLIC_FIREBASE_APP_ID="1:862792318307:web:1dd64186820af37c1ca756"
+ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-4G1GZRSQ0T"
 
 
 # ─────────────────────────────────────────
@@ -27,6 +33,8 @@ WORKDIR /app/backend
 # Backend dependencies
 COPY backend/package*.json ./
 RUN npm install --omit=dev
+
+
 
 # Backend code
 COPY backend/ ./

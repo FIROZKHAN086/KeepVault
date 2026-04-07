@@ -28,6 +28,8 @@ const arimo = Arimo({
   variable: "--font-arimo", 
 });
 
+
+
 import { StoreProvider } from "./StoreProvider";
 import AuthRehydrator from "@/components/layout/AuthRehydrator";
 
