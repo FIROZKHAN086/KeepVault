@@ -90,11 +90,12 @@ export const loginUser = async (req, res) => {
     const token = generateToken(user);
 
     // send cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // After production change to true
-      sameSite: "lax",
-    });
+   res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,          
+  sameSite: "None",      
+  path: "/",             
+});
 
     res.json({
       message: "Login success",
