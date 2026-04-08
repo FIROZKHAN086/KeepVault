@@ -1,8 +1,9 @@
 import cron from "node-cron";
 import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 
-const URL = process.env.URL || "http://localhost:5000/api/health";
-
+const  URL = process.env.CRON_URL ||  "http://localhost:5000/api/health";
 
 cron.schedule("*/10 * * * * *", async () => {
   try {
