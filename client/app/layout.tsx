@@ -10,9 +10,14 @@ import { Roboto,Arimo } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "KeepVault - Secure Document Management System",
-  description: "Your digital vault for sensitive documents. Secure, modern, and privacy-first document storage.",
+  description: "Your digital vault for sensitive documents. Secure, modern, and privacy-first document storage",
+
   icons: {
     icon: 'LOGO.png',
+  },
+
+  verification: {
+    google: "oL4aejLeDtqxjfIYPPQBOg-GddA4_wZ5Nqi7WFNU_VQ",
   },
 };
 
