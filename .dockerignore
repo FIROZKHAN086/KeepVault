@@ -6,5 +6,4 @@
 **/.env
 **/.env.local
 **/README.md
-**/prisma.config.ts
 **/*.log

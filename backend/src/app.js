@@ -2,10 +2,15 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import path from "path";
+
 
 dotenv.config();
 
 const app = express();
+
+
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // ─── Middlewares ──────────────────────────────────────────
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
