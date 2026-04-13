@@ -1,37 +1,20 @@
-# ---------- STEP 1: Build Frontend ----------
-FROM node:18-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
-# client dependencies
-COPY client/package*.json ./client/
-RUN cd client && npm install
 
-# client code
-COPY client ./client
-
-# build frontend
-RUN cd client && npm run build
+COPY backend/package*.json ./
+RUN npm install --omit=dev
 
 
-# ---------- STEP 2: Backend ----------
-FROM node:18-alpine
+COPY backend/ ./
 
-WORKDIR /app
 
-# backend dependencies
-COPY backend/package*.json ./backend/
-RUN cd backend && npm install --omit=dev
 
-# backend code
-COPY backend ./backend
+RUN npx prisma generate
 
-# frontend build → backend public folder
-COPY --from=builder /app/client/out ./backend/public
-
-# backend folder में shift
-WORKDIR /app/backend
 
 EXPOSE 5000
 
-CMD ["npm", "start"]
+
+CMD ["node", "server.js"]
