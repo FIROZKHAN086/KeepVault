@@ -9,7 +9,8 @@ import Pricing from './Pricing'
 
 const Home = () => {
   return (
-    <div>
+    <div
+    suppressHydrationWarning={true}>
       <Hero/>
         <TrustSection/>
         <FeaturesSection/>

@@ -14,7 +14,11 @@ import {
   Zap,
   LayoutGrid,
   List,
-  RefreshCw
+  RefreshCw,
+  Sparkles,
+  Shield,
+  Clock,
+  HardDrive
 } from 'lucide-react';
 
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
@@ -49,7 +53,7 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, isInitializing, router]);
 
-  if (isInitializing) return null; // AuthRehydrator shows the loading screen
+  if (isInitializing) return null;
   if (!isAuthenticated) return null;
 
   const handleDelete = async (id: string) => {
@@ -72,121 +76,145 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0a0612] flex overflow-hidden">
+    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#030014] flex overflow-hidden transition-colors duration-1000">
       
-      {/* ── Sidebar ── */}
+      {/* --- Dynamic Background --- */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[20%] w-[40%] h-[40%] rounded-full bg-purple-500/5 dark:bg-purple-600/10 blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] rounded-full bg-blue-500/5 dark:bg-cyan-600/10 blur-[120px]" />
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.15] dark:opacity-[0.25] mix-blend-overlay" />
+        <div className="absolute inset-0 dark:bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[linear-gradient(to_right,#00000003_1px,transparent_1px),linear-gradient(to_bottom,#00000003_1px,transparent_1px)] bg-[size:60px_60px]" />
+      </div>
+
       <DashboardSidebar />
 
-      {/* ── Main Content Area ── */}
-      <div className="flex-1 flex flex-col lg:pl-64 min-w-0 overflow-hidden">
-        
-        {/* ── Header ── */}
+      <div className="flex-1 flex flex-col lg:pl-64 min-w-0 overflow-hidden relative z-10">
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
-        {/* ── Scrollable Dashboard Content ── */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 custom-scrollbar">
-          <div className="max-w-7xl mx-auto space-y-10">
+        <main className="flex-1 overflow-y-auto p-6 sm:p-10 lg:p-12 custom-scrollbar">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-7xl mx-auto space-y-12"
+          >
             
             {/* Header Actions */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-              <div>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+              <div className="space-y-2">
                 <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 mb-2"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center gap-2.5"
                 >
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">System Secure • 256-bit AES</span>
+                  <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Vault Encrypted</span>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center gap-2">
+                    <ShieldCheck className="w-3 h-3 text-purple-500" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-600 dark:text-purple-400">Zero-Knowledge</span>
+                  </div>
                 </motion.div>
-                <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Vault Overview</h2>
-                <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">Manage your encrypted assets and security health.</p>
+                <h2 className="text-5xl sm:text-6xl font-black text-gray-900 dark:text-white tracking-tighter uppercase leading-[0.9]">
+                  Dashboard <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 dark:from-purple-400 dark:to-pink-400">Overview.</span>
+                </h2>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <Button 
                   variant="outline" 
                   size="icon"
                   onClick={() => refetch()}
                   className={cn(
-                    "rounded-xl border-gray-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/5 transition-all h-12 w-12",
+                    "rounded-2xl border-white dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-xl hover:bg-white dark:hover:bg-white/10 transition-all h-14 w-14 shadow-xl shadow-purple-500/5",
                     isFetching && "animate-spin"
                   )}
                 >
-                  <RefreshCw className="w-5 h-5 text-gray-500" />
+                  <RefreshCw className="w-6 h-6 text-gray-500" />
                 </Button>
                 <Button 
                    onClick={() => setIsUploadOpen(true)}
-                   className="bg-linear-to-br from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-black px-6 h-12 rounded-xl shadow-lg shadow-violet-500/30 transition-all active:scale-95 flex items-center gap-2"
+                   className="bg-gray-900 hover:bg-black dark:bg-white dark:text-black dark:hover:bg-gray-100 font-black px-8 h-14 rounded-2xl shadow-2xl shadow-purple-500/20 transition-all active:scale-95 flex items-center gap-3 group uppercase tracking-tight"
                 >
-                  <Plus className="w-5 h-5" />
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
                   <span>Secure Deposit</span>
                 </Button>
               </div>
             </div>
 
             {/* Stats Cards Row */}
-            <StatsCards 
-              totalFiles={documents.length} 
-              totalStorage="0.6 GB" 
-              securityScore={98} 
-            />
+            <div className="relative">
+               <StatsCards 
+                totalFiles={documents.length} 
+                totalStorage="0.6 GB" 
+                securityScore={98} 
+               />
+            </div>
 
             {/* Document Section Shell */}
-            <div className="space-y-6">
-               <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Recent Deposits</h3>
-                    <div className="flex items-center bg-gray-100 dark:bg-white/5 p-1 rounded-lg">
-                       <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md bg-white dark:bg-white/10 shadow-sm"><List className="w-3.5 h-3.5" /></Button>
-                       <Button variant="ghost" size="icon" className="w-7 h-7 rounded-md text-gray-400"><LayoutGrid className="w-3.5 h-3.5" /></Button>
+            <div className="space-y-8 pt-4">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="flex items-center gap-6">
+                    <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">Recent Deposits</h3>
+                    <div className="hidden sm:flex items-center bg-white/40 dark:bg-white/5 backdrop-blur-md p-1.5 rounded-2xl border border-white dark:border-white/10">
+                       <Button variant="ghost" size="icon" className="w-9 h-9 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-black shadow-lg"><List className="w-4 h-4" /></Button>
+                       <Button variant="ghost" size="icon" className="w-9 h-9 rounded-xl text-gray-400 hover:text-gray-900 dark:hover:text-white"><LayoutGrid className="w-4 h-4" /></Button>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
-                    <div className="relative group hidden sm:block">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-violet-500 transition-colors" />
+                  <div className="flex items-center gap-4">
+                    <div className="relative group w-full sm:w-64">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400 group-focus-within:text-purple-500 transition-colors" />
                         <Input 
-                          placeholder="Quick find..." 
+                          placeholder="Quick search..." 
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-9 h-9 w-48 bg-white dark:bg-white/2 border-gray-200 dark:border-white/5 rounded-xl text-xs font-bold focus:ring-1 focus:ring-violet-500/30 transition-all"
+                          className="pl-11 h-12 bg-white/40 dark:bg-white/5 border-2 border-transparent focus:border-purple-500/20 rounded-2xl text-xs font-bold uppercase tracking-tight transition-all shadow-xl shadow-purple-500/5"
                         />
                     </div>
                     <Button 
                       variant="ghost" 
                       onClick={() => router.push('/dashboard/documents')}
-                      className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10 gap-1.5 rounded-xl"
+                      className="h-12 px-5 text-xs font-black text-purple-600 dark:text-purple-400 hover:bg-purple-500/10 gap-2 rounded-2xl uppercase tracking-widest transition-all"
                     >
-                        View All <ArrowUpRight className="w-3.5 h-3.5" />
+                        All Files <ArrowUpRight className="w-4 h-4" />
                     </Button>
                   </div>
                </div>
 
-               {/* The File Table */}
-               {isLoading ? (
-                 <div className="grid grid-cols-1 gap-4">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="h-20 w-full rounded-2xl bg-gray-200/50 dark:bg-white/5 animate-pulse" />
-                    ))}
-                 </div>
-               ) : (
-                 <FileTable 
-                    documents={filteredDocs} 
-                    onDelete={handleDelete}
-                    onEdit={handleEdit}
-                 />
-               )}
+               {/* The File Table Shell */}
+               <div className="bg-white/40 dark:bg-white/5 backdrop-blur-2xl rounded-[2.5rem] border border-white dark:border-white/10 shadow-2xl overflow-hidden min-h-[400px]">
+                 {isLoading ? (
+                   <div className="p-8 space-y-4">
+                      {[1,2,3,4].map(i => (
+                        <div key={i} className="h-20 w-full rounded-3xl bg-white/50 dark:bg-white/10 animate-pulse" />
+                      ))}
+                   </div>
+                 ) : (
+                   <FileTable 
+                      documents={filteredDocs} 
+                      onDelete={handleDelete}
+                      onEdit={handleEdit}
+                   />
+                 )}
+               </div>
             </div>
 
-          </div>
+          </motion.div>
         </main>
 
-        {/* ── Footer Info ── */}
-        <footer className="px-10 py-4 border-t border-gray-200 dark:border-white/5 bg-white/50 dark:bg-[#0d0914]/50 flex justify-between items-center">
-            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">© 2026 KeepVault Inc. • Secured by AES-256 GCM</p>
-            <div className="flex gap-4">
-               <span className="text-[10px] font-bold text-violet-500 cursor-pointer hover:underline">Privacy Policy</span>
-               <span className="text-[10px] font-bold text-violet-500 cursor-pointer hover:underline">Audited Report</span>
+        {/* ── Dashboard Footer ── */}
+        <footer className="px-12 py-6 border-t border-white dark:border-white/10 bg-white/20 dark:bg-white/2 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Shield className="w-4 h-4 text-emerald-500" />
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">© 2026 KeepVault Architecture • End-to-End Encrypted</p>
+            </div>
+            <div className="flex gap-8">
+               <span className="text-[10px] font-black text-purple-500 cursor-pointer hover:underline uppercase tracking-widest">Privacy Standards</span>
+               <span className="text-[10px] font-black text-purple-500 cursor-pointer hover:underline uppercase tracking-widest">Security Audit</span>
             </div>
         </footer>
 
@@ -207,5 +235,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-

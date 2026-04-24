@@ -61,10 +61,10 @@ export default function Navbar() {
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className={`relative bg-linear-to-br from-[#faf9f6] via-[#f2f0eb] to-[#e8e6df] dark:from-[#0d0914] dark:via-[#130d1f] dark:to-[#08050d] transition-colors duration-700 max-w-6xl mx-auto rounded-2xl  ${
+          className={`relative bg-white/70 dark:bg-[#030014]/70 transition-all duration-700 max-w-6xl mx-auto rounded-2xl ${
             scrolled
-              ? ' backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.4)] border border-gray-200/80 dark:border-white/[0.07]'
-              : ' backdrop-blur-xl border border-gray-200/50'
+              ? 'backdrop-blur-2xl shadow-2xl border border-white/80 dark:border-white/10'
+              : 'backdrop-blur-xl border border-white/40 dark:border-white/5'
           }`}
         >
 

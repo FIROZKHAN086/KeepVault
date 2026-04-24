@@ -37,11 +37,11 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="relative bg-white dark:bg-[#0a0808] border-t border-gray-200 dark:border-white/5 overflow-hidden">
+    <footer className="relative bg-[#faf9f6] dark:bg-[#030014] border-t border-gray-200 dark:border-white/5 overflow-hidden">
       {/* Background glow isolation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -bottom-1/2 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-t from-purple-500/10 to-transparent blur-[120px] dark:from-purple-500/5 mix-blend-screen" />
-        <div className="absolute inset-0 bg-grid-pattern-light dark:bg-grid-pattern opacity-[0.02] dark:opacity-[0.03]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05] dark:opacity-[0.1] mix-blend-overlay" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10">
