@@ -185,7 +185,7 @@ export default function StatsCards({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const storagePercentage = (storageUsed / storageLimit) * 100;
+  const storagePercentage:number = (storageUsed / storageLimit) * 100;
 
   const stats = [
     {
@@ -455,7 +455,7 @@ const StatCard = ({ stat, isMobile }: { stat: any; isMobile: boolean }) => {
                       type === 'documents' ? "bg-emerald-500" : "bg-gray-500"
                     )} />
                     <span className="text-gray-600 dark:text-gray-400 capitalize">
-                      {type}: {percentage}%
+                      {type}: {percentage as number}%
                     </span>
                   </div>
                 ))}
@@ -501,7 +501,7 @@ const StatCard = ({ stat, isMobile }: { stat: any; isMobile: boolean }) => {
                       type === 'images' ? "bg-pink-500" :
                       type === 'documents' ? "bg-emerald-500" : "bg-gray-500"
                     )} />
-                    <span className="text-gray-600 dark:text-gray-400 capitalize">{type}: {percentage}%</span>
+                    <span className="text-gray-600 dark:text-gray-400 capitalize">{type}: {percentage as number}%</span>
                   </div>
                 ))}
               </div>

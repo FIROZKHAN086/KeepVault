@@ -43,8 +43,8 @@ const menuItems = [
 const SidebarLoader = ({ onLoadingComplete }: { onLoadingComplete: () => void }) => {
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState("Initializing secure vault...");
-  const intervalRef = useRef<NodeJS.Timeout>();
-  const messageIntervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<null | NodeJS.Timeout>(null);
+  const messageIntervalRef = useRef<null | NodeJS.Timeout>(null);
 
   useEffect(() => {
     // Progress animation
