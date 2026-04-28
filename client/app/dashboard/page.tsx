@@ -148,6 +148,7 @@ export default function DashboardPage() {
             {/* Stats Cards Row */}
             <div className="relative">
                <StatsCards 
+               
                 totalFiles={documents.length} 
                 totalStorage="0.6 GB" 
                 securityScore={98} 
