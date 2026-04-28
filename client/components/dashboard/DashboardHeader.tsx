@@ -1,16 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { 
-  Search, 
   Bell, 
-  Menu, 
   Search as SearchIcon,
-  ChevronRight,
-  ShieldCheck,
   Calendar,
   MoreVertical,
-  Plus,
+
   Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,18 +21,11 @@ export default function DashboardHeader({ onMenuClick }: { onMenuClick: () => vo
   const greeting = hours < 12 ? 'Good Morning' : hours < 18 ? 'Good Afternoon' : 'Good Evening';
 
   return (
-    <header className="h-20 border-b border-white dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-2xl sticky top-0 z-40 px-6 sm:px-10 flex items-center justify-between transition-all">
+    <header className="h-20 border-b w-full border-white dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-2xl sticky top-0 z-40 px-6 sm:px-10 flex items-center justify-between transition-all">
       
       {/* Welcome Message */}
       <div className="flex items-center gap-6">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="lg:hidden rounded-xl bg-white/50 dark:bg-white/5" 
-          onClick={onMenuClick}
-        >
-          <Menu className="w-5 h-5 text-gray-900 dark:text-white" />
-        </Button>
+        
         <div className="hidden sm:block">
           <motion.div
             initial={{ opacity: 0, x: -10 }}
