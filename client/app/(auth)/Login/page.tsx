@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLoginMutation } from '@/store/api/apiSlice';
+import { useLoginMutation, useLoginWithGoogleMutation } from '@/store/api/apiSlice';
 import { useDispatch } from 'react-redux';
 import { setUser } from '@/store/slices/authSlice';
 import { useRouter } from 'next/navigation';
@@ -18,10 +18,14 @@ import {
   Star, 
   AlertCircle, 
   Loader2,
-  Sparkles,
-  ChevronLeft
+  ChevronLeft,
+  SeparatorHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FaChrome } from 'react-icons/fa';
+import { cn } from '@/lib/utils';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -30,6 +34,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const [login, { isLoading }] = useLoginMutation();
+  const [googleLogin, { isLoading: isGoogleLoading }] = useLoginWithGoogleMutation();
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -40,10 +45,31 @@ export default function LoginPage() {
       const res = await login({ email, password }).unwrap();
       dispatch(setUser(res.user));
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err:any ) {
       setError(err?.data?.message || 'Login failed. Please check your credentials.');
     }
   };
+
+
+// Google 
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+      const res = await googleLogin(token).unwrap();
+      dispatch(setUser(res.user));
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.log(error.message);
+     if (error.message === 'Firebase: Error (auth/popup-blocked).') {
+        setError('In your browser settings, allow pop-ups for this site to enable Google login.');
+      } else {
+        setError('Google login failed. Please try again.');
+      }
+    }
+  };
+
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#faf9f6] dark:bg-[#030014] transition-colors duration-1000 p-4">
@@ -121,6 +147,44 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
+
+           <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+             <motion.button
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleGoogleLogin}
+      disabled={isLoading}
+      className={cn(
+        "w-full py-3 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-700",
+        "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
+        "transition-all duration-200 flex items-center justify-center gap-3",
+        "font-semibold text-gray-700 dark:text-gray-300",
+        isLoading && "opacity-50 cursor-not-allowed"
+      )}
+    >
+      {isLoading ? (
+        <Loader2 className="w-5 h-5 animate-spin" />
+      ) : (
+        <FaChrome className="w-5 h-5" />
+      )}
+      <span>Continue with Google</span>
+    </motion.button>
+              
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <SeparatorHorizontal className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white/80 dark:bg-gray-900/80 px-3 text-gray-500 dark:text-gray-400">
+                    Or continue with email
+                  </span>
+                </div>
+              </div>
+            </motion.div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <AnimatePresence mode="wait">
