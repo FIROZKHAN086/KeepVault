@@ -1,24 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Plus, 
   Search, 
-  Filter, 
   ArrowUpRight, 
   ShieldCheck,
-  Zap,
   LayoutGrid,
   List,
   RefreshCw,
-  Sparkles,
   Shield,
-  Clock,
-  HardDrive
 } from 'lucide-react';
 
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
@@ -32,14 +27,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
+
+
 export default function DashboardPage() {
+ 
   const { user, isAuthenticated, isInitializing } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const [selectedDoc, setSelectedDoc] = useState<null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const { data: documents = [], isLoading, isFetching, refetch } = useGetDocumentsByUserIdQuery(user?.id, {
     skip: !user?.id
@@ -195,10 +193,12 @@ export default function DashboardPage() {
                       ))}
                    </div>
                  ) : (
-                   <FileTable 
+                  <FileTable 
                       documents={filteredDocs} 
                       onDelete={handleDelete}
                       onEdit={handleEdit}
+                      onUploadOpen={setIsUploadOpen}
+                      
                    />
                  )}
                </div>

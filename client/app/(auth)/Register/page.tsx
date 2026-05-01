@@ -21,9 +21,15 @@ import {
   Sparkles,
   ChevronLeft,
   Zap,
-  Star
+  Star,
+  SeparatorHorizontal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FaChrome } from 'react-icons/fa';
+import { cn } from '@/lib/utils';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useRegisterWithGoogleMutation } from '@/store/api/apiSlice';
 
 const passwordChecks = [
   { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
@@ -41,6 +47,7 @@ export default function RegisterPage() {
   const [focusPass, setFocusPass] = useState(false);
 
   const [registerUser, { isLoading }] = useRegisterMutation();
+  const [registerWithGoogle, { isLoading: isGoogleLoading }] = useRegisterWithGoogleMutation();
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -61,6 +68,23 @@ export default function RegisterPage() {
   const passStrength = passwordChecks.filter(c => c.test(password)).length;
   const strengthColors = ['bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-emerald-500'];
   const strengthLabels = ['', 'Weak', 'Fair', 'Strong'];
+
+  const handleGoogleRegister = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+      const res = await registerWithGoogle(token).unwrap();
+      dispatch(setUser(res.user));
+      router.push('/dashboard');
+    } catch (err: any) {
+      if (err.message === 'Firebase: Error (auth/popup-blocked).') {
+        setError('In your browser settings, allow pop-ups for this site to enable Google login.');
+      } else {
+        setError('Google registration failed. Please try again.');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#faf9f6] dark:bg-[#030014] transition-colors duration-1000 p-4">
@@ -137,6 +161,38 @@ export default function RegisterPage() {
                 Sign in
               </Link>
             </p>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleGoogleRegister}
+            disabled={isGoogleLoading}
+            className={cn(
+              "w-full py-3 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-700",
+              "bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700",
+              "transition-all duration-200 flex items-center justify-center gap-3",
+              "font-semibold text-gray-700 dark:text-gray-300 mb-6",
+              isGoogleLoading && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            {isGoogleLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <FaChrome className="w-5 h-5" />
+            )}
+            <span>Continue with Google</span>
+          </motion.button>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <SeparatorHorizontal className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white/80 dark:bg-gray-900/80 px-3 text-gray-500 dark:text-gray-400">
+                Or continue with email
+              </span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

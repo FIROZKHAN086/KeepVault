@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import { 
   FileText, 
@@ -15,7 +15,6 @@ import {
   Signal
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
 interface StatsProps {
@@ -42,8 +41,8 @@ interface AnimatedCounterProps {
 
 // Animated Counter Component
 const AnimatedCounter = ({ value, duration = 1, suffix = '', prefix = '' }: AnimatedCounterProps) => {
-  const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const [count, setCount] = useState<number>(0);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {

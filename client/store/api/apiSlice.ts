@@ -5,8 +5,7 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
-    // By providing this, Next.js / fetch will include cookies with the request!
-    prepareHeaders: (headers) => {
+        prepareHeaders: (headers) => {
       return headers;
     },
     fetchFn: (input, init) => {
@@ -38,6 +37,22 @@ export const apiSlice = createApi({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
+      }),
+      invalidatesTags: ["User"],
+    }),
+    loginWithGoogle: builder.mutation({
+      query: (token) => ({
+        url: "/auth/google",
+        method: "POST",
+        body: { token },
+      }),
+      invalidatesTags: ["User"],
+    }),
+    registerWithGoogle: builder.mutation({
+      query: (token) => ({
+        url: "/auth/google",
+        method: "POST",
+        body: { token },
       }),
       invalidatesTags: ["User"],
     }),
@@ -83,7 +98,9 @@ export const apiSlice = createApi({
 export const { 
   useLoginMutation, 
   useRegisterMutation, 
-  useLogoutUserMutation, 
+  useLoginWithGoogleMutation,
+  useRegisterWithGoogleMutation,
+  useLogoutUserMutation,
   useGetDocumentsQuery,
   useGetDocumentsByUserIdQuery,
   useUploadDocumentMutation,

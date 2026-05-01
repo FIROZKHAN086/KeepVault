@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion,  AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { 
   LayoutDashboard, 
@@ -167,13 +167,14 @@ const SidebarLoader = ({ onLoadingComplete }: { onLoadingComplete: () => void })
 
 // Fixed Scroll Progress Indicator
 const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+ 
 
   return (
     <motion.div
       className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 z-50 origin-left"
-      style={{ scaleX }}
+      style={{ scaleX: 0 }}
+      animate={{ scaleX: 1 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
     />
   );
 };

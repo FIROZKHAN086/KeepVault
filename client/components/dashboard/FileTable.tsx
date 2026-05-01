@@ -37,8 +37,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { motion,  AnimatePresence } from 'framer-motion';
+import {  useState, useEffect } from 'react';
 
 interface Document {
   id: string;
@@ -53,6 +53,7 @@ interface FileTableProps {
   documents: Document[];
   onDelete: (id: string) => void;
   onEdit: (doc: Document) => void;
+  onUploadOpen?: (value: boolean) => void;
 }
 
 const getFileIcon = (fileName: string) => {
@@ -79,22 +80,19 @@ const getFileGradient = (fileName: string) => {
 
 // Table row with scroll animation
 const TableRowAnimated = ({ children, index, isVisible }: any) => {
-  const rowRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: rowRef,
-    offset: ["start end", "end start"]
-  });
+    const [mounted, setMounted] = useState(false);
 
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0.5]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.95, 1, 1, 0.98]);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <motion.tr
-      ref={rowRef}
+     
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: isVisible ? 1 : 0, x: 0 }}
       transition={{ delay: index * 0.08, duration: 0.4, type: "spring", stiffness: 100 }}
-      style={{ opacity, scale }}
+    
       className="group border-gray-200 dark:border-white/5 hover:bg-gradient-to-r hover:from-violet-50/50 hover:to-transparent dark:hover:from-violet-500/10 dark:hover:to-transparent transition-all duration-300"
     >
       {children}
@@ -162,29 +160,18 @@ const StarButton = ({ isFavorite, onClick }: { isFavorite: boolean; onClick: () 
   );
 };
 
-// Shimmer effect for loading state
-const Shimmer = ({ children }: { children: React.ReactNode }) => (
-  <div className="relative overflow-hidden">
-    {children}
-    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-  </div>
-);
 
-export default function FileTable({ documents, onDelete, onEdit }: FileTableProps) {
+
+export default function FileTable({ documents, onDelete, onEdit ,onUploadOpen  }: FileTableProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [visibleRows, setVisibleRows] = useState<Set<string>>(new Set());
-  const tableRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const { scrollYProgress } = useScroll({
-    target: tableRef,
-    offset: ["start end", "end start"]
-  });
-
-  const backgroundOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 1, 0.5]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.98, 1, 0.99]);
+  
 
   useEffect(() => {
+    setMounted(true);
     // Gradually reveal rows
     const timer = setTimeout(() => {
       const newVisible = new Set(visibleRows);
@@ -254,7 +241,10 @@ export default function FileTable({ documents, onDelete, onEdit }: FileTableProp
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Button className="mt-6 font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 dark:from-violet-500 dark:to-fuchsia-500 dark:hover:from-violet-600 dark:hover:to-fuchsia-600 text-white rounded-xl px-6 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Button 
+            onClick={() => onUploadOpen?.(true)}
+            className="mt-6 font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 dark:from-violet-500 dark:to-fuchsia-500 dark:hover:from-violet-600 dark:hover:to-fuchsia-600 text-white rounded-xl px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
             <Sparkles className="w-4 h-4 mr-2" />
             Upload Now
           </Button>
@@ -265,9 +255,7 @@ export default function FileTable({ documents, onDelete, onEdit }: FileTableProp
 
   return (
     <motion.div 
-      ref={tableRef}
-      style={{ opacity: backgroundOpacity, scale }}
-      className="relative"
+          className="relative"
     >
       {/* Animated background gradient */}
       <motion.div 
